@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+//model Post {
+//id        Int      @id @default(autoincrement())
+//createdAt DateTime @default(now())
+//updatedAt DateTime @updatedAt
+//title     String   @db.VarChar(255)
+//content   String?
+//published Boolean  @default(false)
+//author    User     @relation(fields: [authorId], references: [id])
+//authorId  String
+//}
+
+//model Profile {
+//id     Int     @id @default(autoincrement())
+//bio    String?
+//user   User    @relation(fields: [userId], references: [id])
+//userId String     @unique
+//}
+
+model User {
+  id               String                 @id @default(uuid())
+  email            String                 @unique
+  firstName        String                 @db.VarChar(14)
+  lastName         String                 @db.VarChar(14)
+  password         String
+  passwordRestCode String?
+  jwt_refresh      String?                @unique @db.VarChar(290)
+  jwt_socket       String?                @unique @db.VarChar(290)
+  //verificationCode String?
+  //isVerified       Boolean @default(false)
+  profilePic       String?
+  isOnline         Boolean                @default(false)
+  messages         Message[]
+  conversations    UsersOnConversations[]
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  text           String       @db.LongText
+  mediaURL       String?
+  sentBy         User         @relation(fields: [sentByUserId], references: [id])
+  sentByUserId   String
+  sentAt         DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId String
+}
+
+model Conversation {
+  id          String                 @id @default(uuid())
+  name        String?
+  messages    Message[]
+  inbox       Inbox?
+  createdAt   DateTime               @default(now())
+  members     UsersOnConversations[]
+  isGroupChat Boolean                @default(false)
+}
+
+model UsersOnConversations {
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId String
+  member         User         @relation(fields: [userId], references: [id])
+  userId         String
+  isAdmin        Boolean?     @default(false) //creator of group conversations or members promoted to admin
+
+  @@id([conversationId, userId])
+}
+
+model Inbox {
+  id             Int          @id @default(autoincrement())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String       @unique
+  unseenMessages Int
+  //last message will be the last message in coversation table
+}
