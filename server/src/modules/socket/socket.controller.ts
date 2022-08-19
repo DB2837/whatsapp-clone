@@ -4,22 +4,23 @@ import { DefaultEventsMap } from 'socket.io/dist/typed-events'; */
 import { Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import {
-  createPrivateConversation,
-  findGroupConversation,
-  findPrivateConversation,
+  /*  createPrivateConversation, */
+  findConversation,
+  /*  findPrivateConversation, */
   getConversationMembers,
-  getConversationMessages,
+  /*  getConversationMessages, */
+  incrementUnreadMessages,
   /*  saveMessageOnConversation, */
 } from '../conversation/conversation.service';
 import { createMessage } from '../message/message.service';
-import { getUserByID } from '../user/user.service';
+/* import { getUserByID } from '../user/user.service'; */
 
 /* export const onConnectionHandler = (socket) => {
   
   console.log('socket ID: ', socket.id);
 }; */
 
-export const privateMessageHandler = async (
+/* export const privateMessageHandler = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   content: string,
   to: string
@@ -46,6 +47,8 @@ export const privateMessageHandler = async (
     conversation.id
   );
 
+  await incrementUnreadMessages(conversation.id, to);
+
   const convMessages = await getConversationMessages(conversation.id);
 
   console.log(convMessages);
@@ -55,33 +58,22 @@ export const privateMessageHandler = async (
   console.log('to: ', to);
   console.log('from: ', socket.data.user);
 
-  /* socket.to(to).to(socket.data.user.id).emit('private message', {
-    content,
-    from: socket.data.user.id,
-    to,
-  }); */
-};
+  
+}; */
 
-export const groupMessageHandler = async (
+export const messageHandler = async (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   content: string,
   conversationID: string
 ) => {
-  const conversation = await findGroupConversation(conversationID);
+  const conversation = await findConversation(conversationID);
 
   if (!conversation) return;
 
   const members = (await getConversationMembers(conversationID)) || [];
-  const isMember = members.find((id) => id === socket.data.user.id);
+  const isMember = members.find((user) => user.userId === socket.data.user.id);
 
   if (!isMember) return;
-
-  for (const member of members) {
-    socket.to(member.userId).emit('group message', {
-      content,
-      from: socket.data.user,
-    });
-  }
 
   const message = await createMessage(
     content,
@@ -89,15 +81,14 @@ export const groupMessageHandler = async (
     conversation.id
   );
 
-  console.log({ conversation });
-  console.log('message', message);
-  console.log('message: ', content);
+  for (const member of members) {
+    socket.to(member.userId).emit('recive message', message);
+  }
 
-  console.log('from: ', socket.data.user);
-
-  /* socket.to(to).to(socket.data.user.id).emit('private message', {
-    content,
-    from: socket.data.user.id,
-    to,
-  }); */
+  for (const member of members) {
+    //if i set the await increment on the same for cycle of socket.emit messages may be slow to arrive
+    if (member.userId !== socket.data.user.id) {
+      await incrementUnreadMessages(conversation.id, member.userId);
+    }
+  }
 };

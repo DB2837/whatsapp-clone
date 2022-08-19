@@ -4,7 +4,7 @@ export const jwtPayloadSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   firstName: z.string().max(14),
-  /* lastName: z.string().max(14), */
+  lastName: z.string().max(14),
 });
 
 export const loginSchema = z.object({

@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
 import { getUserByID } from '../user/user.service';
 import {
+  clearUnreadMessages,
   createGroupConversation,
   deleteGroupConversation,
+  getConversationInboxes,
+  getConversationMembers,
   getGroupConversationAdmin,
+  getUserConversation,
   getUserConversations,
 } from './conversation.service';
 
@@ -21,9 +25,26 @@ export const getConversations = async (req: Request, res: Response) => {
 export const getConversation = async (req: Request, res: Response) => {
   try {
     const userID = req.user.id;
+    const conversationID = req.params.id;
 
-    const conversations = await getUserConversations(userID);
-    return res.status(201).send(conversations);
+    const members = (await getConversationMembers(conversationID)) || [];
+    const isMember = members.find((user) => user.userId === userID);
+
+    if (!isMember) return;
+
+    const conversation = await getUserConversation(conversationID, userID);
+    return res.status(201).send(conversation);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+};
+
+export const getInboxes = async (req: Request, res: Response) => {
+  try {
+    const userID = req.user.id;
+    const inboxes = await getConversationInboxes(userID);
+
+    return res.status(200).send(inboxes);
   } catch (error) {
     return res.status(500).send(error);
   }
@@ -64,6 +85,22 @@ export const deleteGroupChat = async (req: Request, res: Response) => {
     const deletedConversation = await deleteGroupConversation(id);
 
     return res.status(200).send(deletedConversation);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+};
+
+export const resetUnreadMessages = async (req: Request, res: Response) => {
+  try {
+    const userID = req.user.id;
+    const conversationID = req.params.id;
+
+    if (!userID || !conversationID) {
+      return res.status(400).send('invalid user or conversation');
+    }
+
+    const cleared = await clearUnreadMessages(conversationID, userID);
+    return res.status(200).send(cleared);
   } catch (error) {
     return res.status(500).send(error);
   }

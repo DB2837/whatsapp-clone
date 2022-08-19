@@ -8,13 +8,22 @@ import {
 import {
   createGroupChat,
   deleteGroupChat,
+  getConversation,
   getConversations,
+  getInboxes,
+  resetUnreadMessages,
 } from './conversation.controller';
 
 const router = express.Router();
 
 router.get('/api/allConversations', verifyJwtHTTP, getConversations);
-router.get('/api/conversation/:id', verifyJwtHTTP);
+router.get('/api/inboxes', verifyJwtHTTP, getInboxes);
+router.get('/api/conversation/:id', verifyJwtHTTP, getConversation);
+router.patch(
+  '/api/reset-unread-messages/:id',
+  verifyJwtHTTP,
+  resetUnreadMessages
+);
 router.post('/api/startConversation' /* validateResource() */);
 router.post(
   '/api/createGroup',

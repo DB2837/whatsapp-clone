@@ -5,7 +5,10 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import prisma from '../src/utils/prismaClient';
-import { privateMessageHandler } from './modules/socket/socket.controller';
+import {
+  messageHandler,
+  /* privateMessageHandler, */
+} from './modules/socket/socket.controller';
 import { verifyJwtSocket /* , verifyJwtHTTP */ } from './middlewares/verifyJWT';
 import userRouter from './modules/user/user.route';
 import authRouter from './modules/auth/auth.route';
@@ -54,8 +57,12 @@ io.on('connection', (socket) => {
     content: 'private message',
     from: socket.data.user,
   }); */
-  socket.on('private message', ({ content, to }) =>
+  /* socket.on('private message', ({ content, to }) =>
     privateMessageHandler(socket, content, to)
+  ); */
+
+  socket.on('message', ({ content, conversationID }) =>
+    messageHandler(socket, content, conversationID)
   );
 });
 

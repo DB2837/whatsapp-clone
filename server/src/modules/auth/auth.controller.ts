@@ -28,19 +28,34 @@ export const loginHandler = async (
 
     //create JWTs
     const accessToken = jwt.sign(
-      { id: user.id, email: user.email, firstName: user.firstName },
+      {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
       process.env.ACCESS_TOKEN_SECRET as string,
       { expiresIn: '7m' }
     );
 
     const refreshToken = jwt.sign(
-      { id: user.id, email: user.email, firstName: user.firstName },
+      {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
       process.env.REFRESH_TOKEN_SECRET as string,
       { expiresIn: '7d' }
     );
 
     const socketToken = jwt.sign(
-      { id: user.id, email: user.email, firstName: user.firstName },
+      {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
       process.env.SOCKET_TOKEN_SECRET as string,
       { expiresIn: '7d' }
     );
@@ -70,6 +85,7 @@ export const logoutHandler = async (req: Request, res: Response) => {
 
   try {
     const user = await getUserByToken(refreshToken);
+
     if (!user) {
       res.clearCookie('jwt', {
         httpOnly: true,
@@ -80,6 +96,7 @@ export const logoutHandler = async (req: Request, res: Response) => {
     }
 
     await revokeJWTs(user);
+
     res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
     return res.sendStatus(204);
   } catch (error) {
@@ -112,6 +129,7 @@ export const refreshTokenHandler = async (req: Request, res: Response) => {
         id: user.id,
         email: user.email,
         firstName: user.firstName,
+        lastName: user.lastName,
       },
       process.env.ACCESS_TOKEN_SECRET as string,
       { expiresIn: '7m' }

@@ -15,6 +15,6 @@ export const setJWTs = async (
 export const revokeJWTs = async (user: User) => {
   return await prisma.user.update({
     where: { id: user.id },
-    data: { jwt_refresh: '', jwt_socket: '' },
+    data: { jwt_refresh: null, jwt_socket: null },
   });
 };
