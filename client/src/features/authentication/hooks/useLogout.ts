@@ -17,6 +17,7 @@ const useLogout = () => {
         credentials: 'include',
       })
 
+      localStorage.removeItem('user')
       setAuth(null)
       navigate('/login', { replace: true })
     } catch (err) {

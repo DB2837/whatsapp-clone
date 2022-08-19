@@ -1,39 +1,47 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import Avatar from './Avatar'
 
 type Message = {
-  sentBy: string
+  sentBy: { id: string; firstName: string }
   sentAt: string
   text: string
 }
 
 type TProps = {
-  chatUserName?: string
+  id: string
+  chatName?: string
   chatPic?: string
   unreadMessagesNum?: number
   lastMessage?: Message
 }
 
 const ChatInbox = ({
-  chatUserName,
+  id,
+  chatName,
   lastMessage,
   chatPic,
   unreadMessagesNum,
 }: TProps) => {
+  const navigate = useNavigate()
+  const handleClick = () => navigate(`/chat/${id}`)
+
   return (
     <Container>
       <InfoDiv>
         {' '}
         <Avatar />
       </InfoDiv>
-      <TextDiv>
-        <h4>chat name</h4>
-        <p>username: some more message text...</p>
+      <TextDiv onClick={handleClick}>
+        <h4>{chatName}</h4>
+        <p>
+          {lastMessage?.sentBy['firstName']}:{lastMessage?.text}
+        </p>
       </TextDiv>
       <InfoDiv>
-        <p>21:34</p>
-        <UnreadNum>2</UnreadNum>
+        <p>{lastMessage?.sentAt}</p>
+        {unreadMessagesNum !== 0 && <UnreadNum>{unreadMessagesNum}</UnreadNum>}
       </InfoDiv>
     </Container>
   )

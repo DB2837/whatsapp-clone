@@ -1,14 +1,27 @@
 import React from 'react'
+
 import styled from 'styled-components'
 import ChatInbox from './ChatInbox'
 
-const InboxContainer = () => {
+type TProps = {
+  inboxes: any[]
+}
+
+const InboxContainer = ({ inboxes }: TProps) => {
   return (
     <Wrapper>
-      <ChatInbox />
-      <ChatInbox />
-      <ChatInbox />
-      <ChatInbox />
+      {inboxes &&
+        inboxes?.map((inboxe) => {
+          return (
+            <ChatInbox
+              key={inboxe.id}
+              id={inboxe.id}
+              chatName={inboxe.name}
+              lastMessage={inboxe.lastMessage}
+              unreadMessagesNum={inboxe.unreadMessages}
+            />
+          )
+        })}
     </Wrapper>
   )
 }

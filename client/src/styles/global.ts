@@ -13,6 +13,13 @@ const GlobalStyle = createGlobalStyle`
   outline: 0;
   }
 
+::-webkit-scrollbar {
+  display: none; /* chrome */
+}
+
+-ms-overflow-style:none; /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+
   :root {
   font-family:'Roboto', sans-serif;
   font-size: 16px;
@@ -27,10 +34,13 @@ const GlobalStyle = createGlobalStyle`
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  
   }
 
 
   body { 
+  height:100%;
   min-height: 100vh;
   min-width: 320px;
   color: ${({ theme }: GlobalThemeProps) => theme.primary} /* #e4e6eb */;

@@ -1,42 +1,36 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { io, Socket } from 'socket.io-client'
-import DefaultEventsMap from 'socket.io-client'
+import { useEffect } from 'react'
+import { Route, Routes } from 'react-router-dom'
 import styled from 'styled-components'
-import { useAuth } from '../features/authentication/hooks/useAuth'
+import Loader from '../components/Loader'
 import useLogout from '../features/authentication/hooks/useLogout'
 import useRefreshToken from '../features/authentication/hooks/useRefreshToken'
 import InboxContainer from '../features/chats/components/InboxContainer'
-import { TSocket } from '../types'
 import { useSocket } from '../features/chats/hooks/useSocket'
+import useFetchData from '../hooks/useFetchData'
+import { INBOXES_URL } from '../utils/urls'
 
 const Home = () => {
-  /*  const { auth } = useAuth() */
   const { refresh } = useRefreshToken()
   const { logout } = useLogout()
   const socket = useSocket()
 
+  const { data, loading } = useFetchData([INBOXES_URL])
+
   useEffect(() => {
-    socket?.on('private message', (data: any) => {
+    socket?.on('message', (data: any) => {
       console.log({ data })
       /*  console.log({ from }) */
     })
   }, [socket])
-
-  const handleClick = () => {
-    socket?.emit('private message', {
-      content: 'gg message sent',
-      to: 'e1910abc-3c92-4a5d-95ed-7b954cf4320f',
-    })
-  }
 
   return (
     <Container>
       <div>Home</div>
       <button onClick={refresh}>refresh</button>
       <button onClick={logout}>logout</button>
-      <button onClick={handleClick}>send message</button>
+
       <ChatsWrapper>
-        <InboxContainer />
+        {loading ? <Loader /> : <InboxContainer inboxes={data[0]} />}
       </ChatsWrapper>
     </Container>
   )

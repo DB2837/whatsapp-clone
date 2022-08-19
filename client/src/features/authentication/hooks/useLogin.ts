@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import jwt_decode from 'jwt-decode'
 import { useAuth } from './useAuth'
 import { sendCredentials } from '../services/sendCredentials'
 import { LOGIN_URL } from './../../../utils/urls'
@@ -7,6 +8,15 @@ import { LOGIN_URL } from './../../../utils/urls'
 export type TLogInCredential = {
   email: string
   password: string
+}
+
+export type TPayload = {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  iat: number
+  exp: number
 }
 
 const useLogin = () => {
@@ -31,6 +41,17 @@ const useLogin = () => {
       }
 
       const { accessToken, socketToken } = data
+      const payload: TPayload = jwt_decode(accessToken as string)
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          id: payload.id,
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          email: payload.email,
+        })
+      )
+
       setAuth(() => ({
         accessToken,
         socketToken,

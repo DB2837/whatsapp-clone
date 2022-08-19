@@ -29,6 +29,7 @@ const useRefreshToken = () => {
       }: { accessToken: string; socketToken: string } = await response.json() //for now get socket token on refresh token call, later set it on home whit useEffect and here just set refresh
 
       setAuth(() => ({ accessToken, socketToken }))
+      return accessToken
     } catch (err) {
       console.log(err)
     } finally {
