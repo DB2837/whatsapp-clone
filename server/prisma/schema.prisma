@@ -10,24 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//model Post {
-//id        Int      @id @default(autoincrement())
-//createdAt DateTime @default(now())
-//updatedAt DateTime @updatedAt
-//title     String   @db.VarChar(255)
-//content   String?
-//published Boolean  @default(false)
-//author    User     @relation(fields: [authorId], references: [id])
-//authorId  String
-//}
-
-//model Profile {
-//id     Int     @id @default(autoincrement())
-//bio    String?
-//user   User    @relation(fields: [userId], references: [id])
-//userId String     @unique
-//}
-
 model User {
   id               String                 @id @default(uuid())
   email            String                 @unique
@@ -60,7 +42,6 @@ model Conversation {
   id          String                 @id @default(uuid())
   name        String?
   messages    Message[]
-  inbox       Inbox?
   createdAt   DateTime               @default(now())
   members     UsersOnConversations[]
   isGroupChat Boolean                @default(false)
@@ -72,14 +53,7 @@ model UsersOnConversations {
   member         User         @relation(fields: [userId], references: [id])
   userId         String
   isAdmin        Boolean?     @default(false) //creator of group conversations or members promoted to admin
+  unseenMessages Int          @default(0)
 
   @@id([conversationId, userId])
-}
-
-model Inbox {
-  id             Int          @id @default(autoincrement())
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
-  conversationId String       @unique
-  unseenMessages Int
-  //last message will be the last message in coversation table
 }

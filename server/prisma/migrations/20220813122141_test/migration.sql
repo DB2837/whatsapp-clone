@@ -44,18 +44,9 @@ CREATE TABLE `UsersOnConversations` (
     `conversationId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
     `isAdmin` BOOLEAN NULL DEFAULT false,
+    `unseenMessages` INTEGER NOT NULL DEFAULT 0,
 
     PRIMARY KEY (`conversationId`, `userId`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `Inbox` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `conversationId` VARCHAR(191) NOT NULL,
-    `unseenMessages` INTEGER NOT NULL,
-
-    UNIQUE INDEX `Inbox_conversationId_key`(`conversationId`),
-    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
@@ -69,6 +60,3 @@ ALTER TABLE `UsersOnConversations` ADD CONSTRAINT `UsersOnConversations_conversa
 
 -- AddForeignKey
 ALTER TABLE `UsersOnConversations` ADD CONSTRAINT `UsersOnConversations_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Inbox` ADD CONSTRAINT `Inbox_conversationId_fkey` FOREIGN KEY (`conversationId`) REFERENCES `Conversation`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
