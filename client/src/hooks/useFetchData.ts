@@ -1,23 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { useAuth } from '../features/authentication/hooks/useAuth'
-import useCustomFetch, { TFetchOptions } from './useCustomFetch'
+import useCustomFetch from './useCustomFetch'
 
 const useFetchData = (urls: string[]) => {
-  const { auth } = useAuth()
   const _fetch = useCustomFetch()
   const [data, setData] = useState<React.SetStateAction<any>>(null)
-  const [error, setError] = useState<React.SetStateAction<any>>(null)
+  const [error, setError] = useState<React.SetStateAction<boolean>>(false)
   const [loading, setLoading] = useState<React.SetStateAction<boolean>>(true)
-
-  /* const options: TFetchOptions = {
-    method: 'GET',
-    mode: 'cors',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: `Bearer ${auth?.accessToken}`,
-    },
-  } */
 
   useEffect(() => {
     const controller = new AbortController()
@@ -32,9 +20,9 @@ const useFetchData = (urls: string[]) => {
         )
 
         setData(data)
-        setError(null)
+        setError(false)
       } catch (err) {
-        setError(err)
+        setError(true)
       } finally {
         setLoading(false)
       }
@@ -43,7 +31,7 @@ const useFetchData = (urls: string[]) => {
     return () => controller.abort()
   }, [])
 
-  return { data, loading, error }
+  return [data, loading, error]
 }
 
 export default useFetchData
