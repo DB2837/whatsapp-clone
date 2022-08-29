@@ -247,6 +247,78 @@ export const deleteGroupConversation = async (conversationID: string) => {
   });
 };
 
+export const getInbox = async (conversationID: string, userID: string) => {
+  const lastMessagesAndNames = await prisma.conversation.findFirst({
+    where: {
+      id: conversationID,
+      members: {
+        some: {
+          userId: userID,
+        },
+      },
+    },
+    select: {
+      id: true,
+      isGroupChat: true,
+      members: {
+        where: {
+          NOT: {
+            userId: userID,
+          },
+        },
+        select: {
+          member: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+        },
+      },
+      messages: {
+        orderBy: {
+          sentAt: 'desc',
+        },
+        select: {
+          text: true,
+          sentAt: true,
+          sentBy: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+        take: 1,
+      },
+      name: true,
+    },
+  });
+
+  const unreadMessages = await prisma.usersOnConversations.findFirst({
+    where: {
+      userId: userID,
+      conversationId: conversationID,
+    },
+    select: {
+      unseenMessages: true,
+    },
+  });
+
+  if (!lastMessagesAndNames || !unreadMessages) return;
+
+  return {
+    id: lastMessagesAndNames.id,
+    lastMessage: lastMessagesAndNames.messages[0],
+    name: lastMessagesAndNames.isGroupChat
+      ? lastMessagesAndNames.name
+      : lastMessagesAndNames.members[0].member.firstName,
+    unreadMessages: unreadMessages.unseenMessages,
+  };
+};
+
 export const getConversationInboxes = async (userID: string) => {
   const lastMessagesAndNames = await prisma.conversation.findMany({
     where: {
