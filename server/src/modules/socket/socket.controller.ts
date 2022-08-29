@@ -8,6 +8,7 @@ import {
   findConversation,
   /*  findPrivateConversation, */
   getConversationMembers,
+  getInbox,
   /*  getConversationMessages, */
   incrementUnreadMessages,
   /*  saveMessageOnConversation, */
@@ -67,7 +68,6 @@ export const messageHandler = async (
   conversationID: string
 ) => {
   const conversation = await findConversation(conversationID);
-
   if (!conversation) return;
 
   const members = (await getConversationMembers(conversationID)) || [];
@@ -90,5 +90,8 @@ export const messageHandler = async (
     if (member.userId !== socket.data.user.id) {
       await incrementUnreadMessages(conversation.id, member.userId);
     }
+
+    const inbox = await getInbox(conversationID, member.userId);
+    socket.to(member.userId).emit('new inbox', inbox);
   }
 };
