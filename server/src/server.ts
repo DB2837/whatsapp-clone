@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
@@ -20,6 +20,13 @@ const port = process.env.PORT;
 
 const app: Application = express();
 const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -41,38 +48,9 @@ app.use('/logout', route.logoutRouter);
  */
 /* app.use(verifyJwtHTTP); */
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-});
-
-io.use(verifyJwtSocket);
-io.on('connection', (socket) => {
-  console.log(socket.data.user);
-  socket.join(socket.data.user.id);
-  /* socket.emit('recive_private_message', {
-    content: 'private message',
-    from: socket.data.user,
-  }); */
-  /* socket.on('private message', ({ content, to }) =>
-    privateMessageHandler(socket, content, to)
-  ); */
-
-  socket.on('message', ({ content, conversationID }) =>
-    messageHandler(socket, content, conversationID)
-  );
-});
-
 /* io.on('connection', (socket) => {
   console.log(socket.id);
 }); */
-
-app.get('/', (_req: Request, res: Response) => {
-  res.send('Express + TypeScript Server');
-});
 
 app.use(notFound);
 
@@ -80,6 +58,16 @@ const main = async () => {
   try {
     httpServer.listen(port, () => {
       console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+
+      io.use(verifyJwtSocket);
+      io.on('connection', (socket) => {
+        console.log(socket.data.user);
+        socket.join(socket.data.user.id);
+
+        socket.on('message', ({ content, conversationID }) =>
+          messageHandler(socket, content, conversationID)
+        );
+      });
     });
   } catch (error) {
     console.log(error);
