@@ -1,11 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { io } from 'socket.io-client'
 import { TSocket } from '../../../types'
 import { useAuth } from '../../authentication/hooks/useAuth'
 
 export const useSocket = () => {
   const { auth } = useAuth()
-  const socketRef = useRef<TSocket | null>(null)
+  const [socket, setSocket] = useState<TSocket | null>(null)
 
   useEffect(() => {
     const socket = io('http://localhost:3001', {
@@ -15,7 +15,7 @@ export const useSocket = () => {
       },
     })
 
-    socketRef.current = socket
+    setSocket(() => socket)
 
     socket.on('connect', () => {
       console.log(socket.id)
@@ -24,7 +24,7 @@ export const useSocket = () => {
     return () => {
       socket.close()
     }
-  }, [])
+  }, [setSocket])
 
-  return socketRef.current
+  return socket
 }
