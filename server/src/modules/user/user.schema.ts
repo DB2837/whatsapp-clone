@@ -45,4 +45,11 @@ export const createUserSchema = z.object({
     }),
 });
 
+export const searchByEmailSchema = z.object({
+  query: z.object({
+    email: z.string({}).min(1),
+  }),
+});
+
 export type CreateUserInput = z.infer<typeof createUserSchema>['body'];
+export type SearchUserInput = z.infer<typeof searchByEmailSchema>['query'];

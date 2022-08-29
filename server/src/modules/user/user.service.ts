@@ -47,6 +47,21 @@ export const getUserByEmail = async (email: string) => {
   });
 };
 
+export const getUsersByEmail = async (email: string) => {
+  return await prisma.user.findMany({
+    where: {
+      email: {
+        contains: email,
+      },
+    },
+    select: {
+      email: true,
+      isOnline: true,
+      profilePic: true,
+    },
+  });
+};
+
 export const getUserByID = async (id: string) => {
   return await prisma.user.findUnique({
     where: {
