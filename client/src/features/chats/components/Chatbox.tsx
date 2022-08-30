@@ -3,18 +3,18 @@ import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { IoSendSharp } from 'react-icons/io5'
 import Message from './Message'
-import { useSocket } from '../hooks/useSocket'
 import useCustomFetch from '../../../hooks/useCustomFetch'
 import { RESET_UNREAD_MESSAGES_URL } from '../../../utils/urls'
+import { TSocket } from '../../../types'
 
 type TProps = {
   chat: any
   user: any
+  socket: TSocket | null
 }
 
-const Chatbox = ({ chat, user }: TProps) => {
+const Chatbox = ({ chat, user, socket }: TProps) => {
   const navigate = useNavigate()
-  const socket = useSocket()
   const _fetch = useCustomFetch()
   const bottomRef = useRef<any>(null)
   const [messages, setMessages] = useState<any>(() => chat.messages)
@@ -28,13 +28,12 @@ const Chatbox = ({ chat, user }: TProps) => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     _fetch(`${RESET_UNREAD_MESSAGES_URL}${chat.id}`, {
       method: 'PATCH',
-    })
+    }) //move this fetch to useEffect return cb
   }, [messages])
 
   useEffect(() => {
     socket?.on('recive message', (message: any) => {
       setMessages((prev: any) => [...prev, message])
-      /*  console.log({ from }) */
     })
   }, [socket])
 
