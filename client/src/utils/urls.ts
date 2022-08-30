@@ -9,3 +9,5 @@ export const INBOXES_URL = BASE_URL + import.meta.env.VITE_BE_INBOXES_URL
 export const CHAT_URL = BASE_URL + import.meta.env.VITE_BE_CHAT_URL
 export const RESET_UNREAD_MESSAGES_URL =
   BASE_URL + import.meta.env.VITE_BE_RESET_UNREAD_MESSAGES_URL
+export const USERS_BY_EMAIL =
+  BASE_URL + import.meta.env.VITE_BE_USERS_BY_EMAIL_URL
