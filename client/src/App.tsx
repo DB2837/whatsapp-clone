@@ -8,7 +8,6 @@ import SharedLayout from './layouts/SharedLayout'
 import Signup from './pages/Signup'
 import PersistentLogin from './features/authentication/components/PersistentLogin'
 import Home from './pages/Home'
-import SingleChat from './pages/SingleChat'
 
 function App() {
   const { theme, themeToggler } = useThemeMode()
@@ -20,17 +19,13 @@ function App() {
       <Routes>
         <Route element={<PersistentLogin />}>
           <Route
-            path="/"
             element={<SharedLayout themeToggler={themeToggler} theme={theme} />}
           >
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route element={<ProtectedRoute />}>
-              <Route index element={<Home />} />
+              <Route path="/*" element={<Home />} />
             </Route>
-          </Route>
-          <Route element={<ProtectedRoute />}>
-            <Route path="/chat/:id" element={<SingleChat />} />
           </Route>
         </Route>
       </Routes>
