@@ -1,27 +1,40 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import styled from 'styled-components'
+import { TSocket } from '../../../types'
 import ChatInbox from './ChatInbox'
 
 type TProps = {
-  inboxes: any[]
+  inboxesArr: any[]
+  socket: TSocket | null
 }
 
-const InboxContainer = ({ inboxes }: TProps) => {
+const InboxContainer = ({ inboxesArr, socket }: TProps) => {
+  const [inboxes, setInboxes] = useState(() => inboxesArr)
+
+  useEffect(() => {
+    socket?.on('new inbox', (inbox) => {
+      setInboxes((prev) => {
+        const filteredInboxes = prev.filter(
+          (inboxItem) => inboxItem.id !== inbox.id
+        )
+        return [inbox, ...filteredInboxes]
+      })
+    })
+  }, [socket])
   return (
     <Wrapper>
-      {inboxes &&
-        inboxes?.map((inboxe) => {
-          return (
-            <ChatInbox
-              key={inboxe.id}
-              id={inboxe.id}
-              chatName={inboxe.name}
-              lastMessage={inboxe.lastMessage}
-              unreadMessagesNum={inboxe.unreadMessages}
-            />
-          )
-        })}
+      {inboxes?.map((inboxe) => {
+        return (
+          <ChatInbox
+            key={inboxe.id}
+            id={inboxe.id}
+            chatName={inboxe.name}
+            lastMessage={inboxe.lastMessage}
+            unreadMessagesNum={inboxe.unreadMessages}
+          />
+        )
+      })}
     </Wrapper>
   )
 }
