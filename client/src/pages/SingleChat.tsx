@@ -4,11 +4,16 @@ import styled from 'styled-components'
 import Loader from '../components/Loader'
 import Chatbox from '../features/chats/components/Chatbox'
 import useFetchData from '../hooks/useFetchData'
+import { TSocket } from '../types'
 import { CHAT_URL } from '../utils/urls'
 
-const SingleChat = () => {
+type TProps = {
+  socket: TSocket | null
+}
+
+const SingleChat = ({ socket }: TProps) => {
   const { id } = useParams()
-  const { data, loading } = useFetchData([`${CHAT_URL}${id}`])
+  const [chatArr, loading] = useFetchData([`${CHAT_URL}${id}`])
   const userRef = useRef(JSON.parse(localStorage.getItem('user') ?? ''))
 
   return (
@@ -16,8 +21,8 @@ const SingleChat = () => {
       <ChatsWrapper>
         {loading ? (
           <Loader />
-        ) : data[0] ? (
-          <Chatbox chat={data[0]} user={userRef.current} />
+        ) : chatArr[0] ? (
+          <Chatbox chat={chatArr[0]} user={userRef.current} socket={socket} />
         ) : (
           ''
         )}
