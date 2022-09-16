@@ -1,8 +1,10 @@
 import { useState, useEffect, Dispatch, SetStateAction } from 'react'
 
 function getSavedValue<T>(key: string, initialValue: T) {
-  const savedValue = JSON.parse(localStorage.getItem(key) ?? '')
-  if (savedValue) return savedValue
+  if (localStorage[key]) {
+    const savedValue = JSON.parse(localStorage.getItem(key) ?? '')
+    if (savedValue) return savedValue
+  }
 
   if (initialValue instanceof Function) return initialValue()
 
